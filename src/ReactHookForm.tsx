@@ -8,12 +8,17 @@ import {
   FormLabel,
   Input,
   Select,
+  VStack,
+  Heading,
+  Container,
+  SimpleGrid,
 } from "@chakra-ui/react";
-import { SubmitHandler, useFieldArray, useForm } from "react-hook-form";
+import { SubmitHandler, useFieldArray, useForm, Controller } from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Schema } from "./Schema.tsx";
-
+import ReactQuill from 'react-quill';
+import 'react-quill/dist/quill.snow.css';
 
 type FormFields = z.infer<typeof Schema>;
 
@@ -22,12 +27,17 @@ const ReactHookForm = () => {
     register,
     handleSubmit,
     formState: { errors, isSubmitting },
-    control, watch, resetField
+    control,
+    watch,
+    resetField
   } = useForm<FormFields>({
     defaultValues: {
+      first_name: "",
       email: "",
       password: "",
-      age: null,
+      gender: undefined,
+      address: { city: "", state: "" },
+      age: undefined,
       hobbies: [{ name: "" }],
       acceptPrivacy: false,
       description: "",
@@ -40,169 +50,167 @@ const ReactHookForm = () => {
 
   useEffect(() => {
     if (!acceptPrivacy) {
-      resetField("description"); 
+      resetField("description");
     }
   }, [acceptPrivacy, resetField]);
 
-  const {append,fields, remove}= useFieldArray({
-   control,  
-   name: "hobbies"
-  })
+  const { fields, append, remove } = useFieldArray({
+    control,
+    name: "hobbies"
+  });
 
   const onSubmit: SubmitHandler<FormFields> = (data) => {
     console.log(data);
   };
+
   return (
-    <Box>
-      <form onSubmit={handleSubmit(onSubmit)}>
-        <FormControl isInvalid={!!errors.first_name}>
-          <FormLabel htmlFor="first_name">First Name</FormLabel>
-          <Input
-            id={"first_name"}
-            type={"text"}
-            placeholder="First name"
-            {...register("first_name")}
-          />
-          {errors.first_name && (
-            <FormErrorMessage>{errors.first_name?.message}</FormErrorMessage>
-          )}
-        </FormControl>
-
-        <FormControl isInvalid={!!errors.email}>
-          <FormLabel htmlFor="email">Email</FormLabel>
-          <Input
-            id={"email"}
-            type={"email"}
-            placeholder="Email"
-            {...register("email")}
-          />
-          {errors.email && (
-            <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
-          )}
-        </FormControl>
-
-        <FormControl mt={4} isInvalid={!!errors.password}>
-          <FormLabel htmlFor="password">Password</FormLabel>
-          <Input
-            id="password"
-            type="password"
-            placeholder="Password"
-            {...register("password")}
-          />
-          {errors.password && (
-            <FormErrorMessage>{errors.password.message}</FormErrorMessage>
-          )}
-        </FormControl>
-
-        <FormControl mt={4} isInvalid={!!errors.gender}>
-          <FormLabel htmlFor="gender">Gender</FormLabel>
-          <Select {...register("gender")} placeholder="Select">
-            <option value={"Male"}>Male</option>
-            <option value={"Female"}>Female</option>
-            <option value={"Others"}>Others</option>
-          </Select>
-          {errors.gender && (
-            <FormErrorMessage>{errors.gender.message}</FormErrorMessage>
-          )}
-        </FormControl>
-
-        <FormControl mt={4} isInvalid={!!errors.address?.city}>
-          <FormLabel htmlFor="city">City</FormLabel>
-          <Input
-            id="city"
-            type="text"
-            placeholder="Enter City"
-            {...register("address.city")}
-          />
-          {errors.address?.city && (
-            <FormErrorMessage>{errors.address?.city.message}</FormErrorMessage>
-          )}
-        </FormControl>
-
-        <FormControl mt={4} isInvalid={!!errors.address?.state}>
-          <FormLabel htmlFor="state">State</FormLabel>
-          <Input
-            id="state"
-            type="text"
-            placeholder="Enter state"
-            {...register("address.state")}
-          />
-          {errors.address?.state && (
-            <FormErrorMessage>{errors.address?.state.message}</FormErrorMessage>
-          )}
-        </FormControl>
-
-        <FormControl mt={4} isInvalid={!!errors.age}>
-          <FormLabel htmlFor="age">Age</FormLabel>
-          <Input
-            id="age"
-            type="number"
-            placeholder="Enter age"
-            {...register("age", { valueAsNumber: true })}
-          />
-          {errors.age && (
-            <FormErrorMessage>{errors.age.message}</FormErrorMessage>
-          )}
-        </FormControl>
-
-        <FormControl isInvalid={!!errors.acceptPrivacy}>
-        <Checkbox {...register("acceptPrivacy")}>
-          I accept the privacy policy
-        </Checkbox>
-        {errors.acceptPrivacy && (
-          <FormErrorMessage>
-            {errors.acceptPrivacy.message}
-          </FormErrorMessage>
-        )}
-      </FormControl>
-
-      {acceptPrivacy && (
-        <FormControl isInvalid={!!errors.description} mt={4}>
-          <FormLabel htmlFor="description">Description</FormLabel>
-          <Input
-            id="description"
-            placeholder="Enter a description"
-            {...register("description")}
-          />
-          {errors.description && (
-            <FormErrorMessage>{errors.description.message}</FormErrorMessage>
-          )}
-        </FormControl>
-      )}
-
-        {fields.map((item, index) => (
-        <FormControl
-          key={item.id}
-          isInvalid={!!errors?.hobbies?.[index]?.name}
+    <Container maxW="container.xl" py={10}>
+      <VStack spacing={8} align="stretch">
+        <Heading as="h1" size="xl" textAlign="center">
+          Registration Form
+        </Heading>
+        <Box
+          as="form"
+          onSubmit={handleSubmit(onSubmit)}
+          bg="white"
+          p={8}
+          borderRadius="md"
+          boxShadow="md"
         >
-          <FormLabel htmlFor={`hobbies[${index}].name`}>Hobby Name</FormLabel>
-          <Input
-            id={`hobbies[${index}].name`}
-            type="text"
-            placeholder="Hobby name"
-            {...register(`hobbies.${index}.name`)}
-          />
-          {errors?.hobbies?.[index]?.name && (
-            <FormErrorMessage>
-              {errors?.hobbies?.[index]?.name?.message}
-            </FormErrorMessage>
-          )}
-        </FormControl>
-      ))}
+          <VStack spacing={6}>
+            <SimpleGrid columns={{ base: 1, md: 2 }} spacing={6} w="full">
+              <FormControl isInvalid={!!errors.first_name}>
+                <FormLabel htmlFor="first_name">First Name</FormLabel>
+                <Input
+                  id="first_name"
+                  placeholder="First name"
+                  {...register("first_name")}
+                />
+                <FormErrorMessage>{errors.first_name?.message}</FormErrorMessage>
+              </FormControl>
 
-      <Button
-        mt={4}
-        onClick={() => append({ name: "" })} 
-      >
-        Add Hobby
-      </Button>
+              <FormControl isInvalid={!!errors.email}>
+                <FormLabel htmlFor="email">Email</FormLabel>
+                <Input
+                  id="email"
+                  type="email"
+                  placeholder="Email"
+                  {...register("email")}
+                />
+                <FormErrorMessage>{errors.email?.message}</FormErrorMessage>
+              </FormControl>
 
+              <FormControl isInvalid={!!errors.password}>
+                <FormLabel htmlFor="password">Password</FormLabel>
+                <Input
+                  id="password"
+                  type="password"
+                  placeholder="Password"
+                  {...register("password")}
+                />
+                <FormErrorMessage>{errors.password?.message}</FormErrorMessage>
+              </FormControl>
 
-        <FormControl>
-          <Button type="submit">Submit</Button>
-        </FormControl>
-      </form>
-    </Box>
+              <FormControl isInvalid={!!errors.gender}>
+                <FormLabel htmlFor="gender">Gender</FormLabel>
+                <Select {...register("gender")} placeholder="Select gender">
+                  <option value="Male">Male</option>
+                  <option value="Female">Female</option>
+                  <option value="Others">Others</option>
+                </Select>
+                <FormErrorMessage>{errors.gender?.message}</FormErrorMessage>
+              </FormControl>
+
+              <FormControl isInvalid={!!errors.address?.city}>
+                <FormLabel htmlFor="city">City</FormLabel>
+                <Input
+                  id="city"
+                  placeholder="Enter City"
+                  {...register("address.city")}
+                />
+                <FormErrorMessage>{errors.address?.city?.message}</FormErrorMessage>
+              </FormControl>
+
+              <FormControl isInvalid={!!errors.address?.state}>
+                <FormLabel htmlFor="state">State</FormLabel>
+                <Input
+                  id="state"
+                  placeholder="Enter state"
+                  {...register("address.state")}
+                />
+                <FormErrorMessage>{errors.address?.state?.message}</FormErrorMessage>
+              </FormControl>
+
+              <FormControl isInvalid={!!errors.age}>
+                <FormLabel htmlFor="age">Age</FormLabel>
+                <Input
+                  id="age"
+                  type="number"
+                  placeholder="Enter age"
+                  {...register("age", { valueAsNumber: true })}
+                />
+                <FormErrorMessage>{errors.age?.message}</FormErrorMessage>
+              </FormControl>
+            </SimpleGrid>
+
+            <VStack spacing={4} align="stretch" w="full">
+              {fields.map((item, index) => (
+                <FormControl key={item.id} isInvalid={!!errors?.hobbies?.[index]?.name}>
+                  <FormLabel htmlFor={`hobbies[${index}].name`}>Hobby {index + 1}</FormLabel>
+                  <Input
+                    id={`hobbies[${index}].name`}
+                    placeholder="Hobby name"
+                    {...register(`hobbies.${index}.name`)}
+                  />
+                  <FormErrorMessage>
+                    {errors?.hobbies?.[index]?.name?.message}
+                  </FormErrorMessage>
+                </FormControl>
+              ))}
+              <Button onClick={() => append({ name: "" })} colorScheme="blue">
+                Add Hobby
+              </Button>
+            </VStack>
+
+            <FormControl isInvalid={!!errors.acceptPrivacy}>
+              <Checkbox {...register("acceptPrivacy")}>
+                I accept the privacy policy
+              </Checkbox>
+              <FormErrorMessage>{errors.acceptPrivacy?.message}</FormErrorMessage>
+            </FormControl>
+
+            {acceptPrivacy && (
+              <FormControl isInvalid={!!errors.description}>
+                <FormLabel htmlFor="description">Description</FormLabel>
+                <Controller
+                  name="description"
+                  control={control}
+                  render={({ field }) => (
+                    <ReactQuill
+                      theme="snow"
+                      value={field.value}
+                      onChange={field.onChange}
+                      style={{ height: '200px', marginBottom: '50px' }}
+                    />
+                  )}
+                />
+                <FormErrorMessage>{errors.description?.message}</FormErrorMessage>
+              </FormControl>
+            )}
+
+            <Button
+              type="submit"
+              colorScheme="green"
+              isLoading={isSubmitting}
+              loadingText="Submitting"
+              width="full"
+            >
+              Submit
+            </Button>
+          </VStack>
+        </Box>
+      </VStack>
+    </Container>
   );
 };
 

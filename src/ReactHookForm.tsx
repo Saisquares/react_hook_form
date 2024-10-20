@@ -1,4 +1,4 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useRef } from "react";
 import {
   Box,
   Button,
@@ -17,8 +17,8 @@ import { SubmitHandler, useFieldArray, useForm, Controller } from "react-hook-fo
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Schema } from "./Schema.tsx";
-import ReactQuill from 'react-quill';
-import 'react-quill/dist/quill.snow.css';
+import ReactQuill from 'react-quill-new';
+import 'react-quill-new/dist/quill.snow.css';
 
 type FormFields = z.infer<typeof Schema>;
 
@@ -32,12 +32,12 @@ const ReactHookForm = () => {
     resetField
   } = useForm<FormFields>({
     defaultValues: {
-      first_name: "",
+      first_name: undefined,
       email: "",
       password: "",
       gender: undefined,
       address: { city: "", state: "" },
-      age: undefined,
+      age:  undefined,
       hobbies: [{ name: "" }],
       acceptPrivacy: false,
       description: "",
@@ -62,6 +62,8 @@ const ReactHookForm = () => {
   const onSubmit: SubmitHandler<FormFields> = (data) => {
     console.log(data);
   };
+
+  const {ref} = useRef()
 
   return (
     <Container maxW="container.xl" py={10}>
@@ -188,6 +190,7 @@ const ReactHookForm = () => {
                   render={({ field }) => (
                     <ReactQuill
                       theme="snow"
+                      ref={ref}
                       value={field.value}
                       onChange={field.onChange}
                       style={{ height: '200px', marginBottom: '50px' }}

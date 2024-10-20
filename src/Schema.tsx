@@ -6,9 +6,10 @@ export const Schema = z
       .string()
       .min(1, "First Name is Required")
       .max(50, "Maximum length is 50 characters")
+      .trim() // removes whitespaces at start and ends
       .regex(
-        /^[A-Za-z]+( [A-Za-z]+)* ?$/,
-        "First Name must contain only alphabetic characters"
+        /^[A-Za-z ]+$/,
+        "First Name must contain only alphabetic characters and spaces"
       ),
     email: z
       .string()
@@ -32,12 +33,11 @@ export const Schema = z
       state: z.string().min(1, "State is required"),
     }),
     age: z
-      .number()
-      .min(19, "Minimum age should be above 18")
-      .nullable()
-      .refine((val) => val !== null, {
-        message: "Age is Required",
-      }),
+      .number({
+        invalid_type_error: "Age is required", 
+      })
+      .min(1, "Age is required") 
+      .min(19, "Minimum age should be above 18"), 
     hobbies: z
       .array(
         z.object({
@@ -49,10 +49,9 @@ export const Schema = z
     description: z.string().optional(),
   })
   .superRefine((data, ctx) => {
-
     if (data.acceptPrivacy && !data.description) {
       ctx.addIssue({
-        code: "custom", 
+        code: "custom",
         path: ["description"],
         message: "Description is required when you accept the privacy policy",
       });

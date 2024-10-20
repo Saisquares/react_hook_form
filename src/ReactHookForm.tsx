@@ -13,12 +13,18 @@ import {
   Container,
   SimpleGrid,
 } from "@chakra-ui/react";
-import { SubmitHandler, useFieldArray, useForm, Controller } from "react-hook-form";
+import {
+  SubmitHandler,
+  useFieldArray,
+  useForm,
+  Controller,
+} from "react-hook-form";
 import { z } from "zod";
 import { zodResolver } from "@hookform/resolvers/zod";
 import { Schema } from "./Schema.tsx";
-import ReactQuill from 'react-quill-new';
-import 'react-quill-new/dist/quill.snow.css';
+import ReactQuill from "react-quill-new";
+import "react-quill-new/dist/quill.snow.css";
+import { TextFormInput } from "./ReusableFormInputs.tsx";
 
 type FormFields = z.infer<typeof Schema>;
 
@@ -29,7 +35,7 @@ const ReactHookForm = () => {
     formState: { errors, isSubmitting },
     control,
     watch,
-    resetField
+    resetField,
   } = useForm<FormFields>({
     defaultValues: {
       first_name: undefined,
@@ -37,7 +43,7 @@ const ReactHookForm = () => {
       password: "",
       gender: undefined,
       address: { city: "", state: "" },
-      age:  undefined,
+      age: undefined,
       hobbies: [{ name: "" }],
       acceptPrivacy: false,
       description: "",
@@ -56,14 +62,13 @@ const ReactHookForm = () => {
 
   const { fields, append, remove } = useFieldArray({
     control,
-    name: "hobbies"
+    name: "hobbies",
   });
 
   const onSubmit: SubmitHandler<FormFields> = (data) => {
     console.log(data);
   };
 
-  const {ref} = useRef()
 
   return (
     <Container maxW="container.xl" py={10}>
@@ -88,7 +93,9 @@ const ReactHookForm = () => {
                   placeholder="First name"
                   {...register("first_name")}
                 />
-                <FormErrorMessage>{errors.first_name?.message}</FormErrorMessage>
+                <FormErrorMessage>
+                  {errors.first_name?.message}
+                </FormErrorMessage>
               </FormControl>
 
               <FormControl isInvalid={!!errors.email}>
@@ -130,7 +137,9 @@ const ReactHookForm = () => {
                   placeholder="Enter City"
                   {...register("address.city")}
                 />
-                <FormErrorMessage>{errors.address?.city?.message}</FormErrorMessage>
+                <FormErrorMessage>
+                  {errors.address?.city?.message}
+                </FormErrorMessage>
               </FormControl>
 
               <FormControl isInvalid={!!errors.address?.state}>
@@ -140,7 +149,9 @@ const ReactHookForm = () => {
                   placeholder="Enter state"
                   {...register("address.state")}
                 />
-                <FormErrorMessage>{errors.address?.state?.message}</FormErrorMessage>
+                <FormErrorMessage>
+                  {errors.address?.state?.message}
+                </FormErrorMessage>
               </FormControl>
 
               <FormControl isInvalid={!!errors.age}>
@@ -157,8 +168,13 @@ const ReactHookForm = () => {
 
             <VStack spacing={4} align="stretch" w="full">
               {fields.map((item, index) => (
-                <FormControl key={item.id} isInvalid={!!errors?.hobbies?.[index]?.name}>
-                  <FormLabel htmlFor={`hobbies[${index}].name`}>Hobby {index + 1}</FormLabel>
+                <FormControl
+                  key={item.id}
+                  isInvalid={!!errors?.hobbies?.[index]?.name}
+                >
+                  <FormLabel htmlFor={`hobbies[${index}].name`}>
+                    Hobby {index + 1}
+                  </FormLabel>
                   <Input
                     id={`hobbies[${index}].name`}
                     placeholder="Hobby name"
@@ -178,7 +194,9 @@ const ReactHookForm = () => {
               <Checkbox {...register("acceptPrivacy")}>
                 I accept the privacy policy
               </Checkbox>
-              <FormErrorMessage>{errors.acceptPrivacy?.message}</FormErrorMessage>
+              <FormErrorMessage>
+                {errors.acceptPrivacy?.message}
+              </FormErrorMessage>
             </FormControl>
 
             {acceptPrivacy && (
@@ -190,14 +208,15 @@ const ReactHookForm = () => {
                   render={({ field }) => (
                     <ReactQuill
                       theme="snow"
-                      ref={ref}
                       value={field.value}
                       onChange={field.onChange}
-                      style={{ height: '200px', marginBottom: '50px' }}
+                      style={{ height: "200px", marginBottom: "50px" }}
                     />
                   )}
                 />
-                <FormErrorMessage>{errors.description?.message}</FormErrorMessage>
+                <FormErrorMessage>
+                  {errors.description?.message}
+                </FormErrorMessage>
               </FormControl>
             )}
 

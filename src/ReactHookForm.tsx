@@ -12,6 +12,9 @@ import {
   Heading,
   Container,
   SimpleGrid,
+  HStack,
+  Text,
+  Center,
 } from "@chakra-ui/react";
 import {
   SubmitHandler,
@@ -24,7 +27,6 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Schema } from "./Schema.tsx";
 import ReactQuill from "react-quill-new";
 import "react-quill-new/dist/quill.snow.css";
-import { TextFormInput } from "./ReusableFormInputs.tsx";
 
 type FormFields = z.infer<typeof Schema>;
 
@@ -76,6 +78,9 @@ const ReactHookForm = () => {
         <Heading as="h1" size="xl" textAlign="center">
           Registration Form
         </Heading>
+        <Center>
+          <Text>React Hook Form + Zod + Quill Text Editor</Text>
+        </Center>
         <Box
           as="form"
           onSubmit={handleSubmit(onSubmit)}
